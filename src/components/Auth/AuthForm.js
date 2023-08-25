@@ -4,6 +4,9 @@ import classes from './AuthForm.module.css';
 
 const AuthForm = () => {
 
+
+  const signUpApiUrl = 'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAvZIq-A0N_hH-2GVtOoec3EgmnERktZAk';
+  const loginApiUrl ='https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAvZIq-A0N_hH-2GVtOoec3EgmnERktZAk';
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
   const [isLogin, setIsLogin] = useState(true);
@@ -14,43 +17,45 @@ const AuthForm = () => {
     setIsLogin((prevState) => !prevState);
   };
 
-  const submitHandler=(event)=>{
 
+
+  const submitHandler=(event)=>{
     event.preventDefault();
     setIsLoading(true)
     const enteredEmail= emailInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
 
-    if(isLogin){
-    }
-    else{
-      fetch(
-        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAvZIq-A0N_hH-2GVtOoec3EgmnERktZAk',
-         {
-          method: "POST", 
-          body: JSON.stringify({
-            email :enteredEmail ,
-            password: enteredPassword,
-            returnSecureToken: true
-          }),
-          headers:{
-            'Content-Type':"application/json"}
-          }
-          ).then(res=>{
-            if(res.ok){
-              setIsLoading(false);
+    const apiUrl = isLogin ? loginApiUrl : signUpApiUrl;
 
-            }
-            else{
-              res.json().then(data=>{
-                  console.log(data);
-                  alert(data.error.message);
-                  setIsLoading(false);
-                }
-              );
-            }
-          });
-        }
+    fetch(apiUrl, {
+      method: "POST",
+      body: JSON.stringify({
+        email: enteredEmail,
+        password: enteredPassword,
+        returnSecureToken: true,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(res => {
+      if (res.ok) {
+        setIsLoading(false);
+        return res.json(); // Return the parsed JSON response
+      } else {
+        return res.json().then(data => {
+          console.log(data);
+          alert(data.error.message);
+          setIsLoading(false);
+          throw new Error(data.error.message); // Throw an error to handle it in the next .catch()
+        });
+      }
+    }).then(data => {
+      // Console log the ID token here
+      console.log('ID Token:', data.idToken);
+    }).catch(error => {
+      console.error('Error:', error);
+    });
+    
   }
  
 
