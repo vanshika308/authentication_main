@@ -71,7 +71,7 @@ const AuthForm = () => {
   return (
     <section className={classes.auth}>
       {loginSuccess? (
-        <Redirect to="/profile"/>
+        <Redirect />
       ):
       (
       <React.Fragment>

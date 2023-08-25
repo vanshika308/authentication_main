@@ -1,22 +1,34 @@
-import {  useState } from "react";
+import {  useState,useEffect } from "react";
 import AuthContext from "./auth-context";
 
 const AuthProvider=(props)=>{
+    const storedToken = localStorage.getItem("token");
     const[token,setToken] = useState(null);
+    const userIsLoggedIn = !!token;
 
     const login=(token)=>{
         setToken(token);
+        localStorage.setItem("token", token);
         console.log(token);
     };
 
     const logout =()=>{
         setToken(null);
+        localStorage.removeItem("token");
     }
     const authContextValue = {
         token: token,
         login: login,
         logout: logout,
-      };
+        isLoggedIn: userIsLoggedIn
+    };
+
+    useEffect(() => {
+        if (storedToken) {
+          setToken(storedToken);
+        }
+      }, []);
+    
 
     return(
         <AuthContext.Provider value={authContextValue}>
