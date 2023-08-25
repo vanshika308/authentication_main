@@ -12,9 +12,14 @@ const AuthProvider=(props)=>{
     const logout =()=>{
         setToken(null);
     }
+    const authContextValue = {
+        token: token,
+        login: login,
+        logout: logout,
+      };
 
     return(
-        <AuthContext.Provider value={{token,logout,login}}>
+        <AuthContext.Provider value={authContextValue}>
             {props.children}
         </AuthContext.Provider>
     );

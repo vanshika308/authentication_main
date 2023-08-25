@@ -13,7 +13,7 @@ const MainNavigation = () => {
         <div className={classes.logo}>React Auth</div>
       </Link>
       <nav>
-      <ul>
+        <ul>
           {!authContext.token && (
             <li>
               <Link to='/auth'>Login</Link>
@@ -25,13 +25,16 @@ const MainNavigation = () => {
                 <Link to='/profile'>Profile</Link>
               </li>
               <li>
-                <button onClick={authContext.logout}>Logout</button>
+                <Link to='/auth' onClick={authContext.logout}>
+                  Logout
+                </Link>
               </li>
             </>
           )}
         </ul>
       </nav>
     </header>
+        
   );
 };
 

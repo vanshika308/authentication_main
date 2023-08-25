@@ -1,6 +1,7 @@
-import { useState,useEffect, useRef, useContext } from 'react';
+import React, { useState,useEffect, useRef, useContext } from 'react';
 import AuthContext from '../../store/auth-context';
 import classes from './AuthForm.module.css';
+import { Redirect } from 'react-router-dom/cjs/react-router-dom.min';
 
 const AuthForm = () => {
 
@@ -11,6 +12,8 @@ const AuthForm = () => {
   const passwordInputRef = useRef();
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false); 
+
 
   useEffect(() => {
     if (!authcntx.token) {
@@ -20,6 +23,7 @@ const AuthForm = () => {
   }, [authcntx.token]);
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
+    setLoginSuccess(false);
   };
 
 
@@ -55,6 +59,8 @@ const AuthForm = () => {
     }).then(data => {
       console.log('ID Token:', data.idToken);
       authcntx.login(data.idToken); 
+      setIsLogin(true);
+      setLoginSuccess(true); 
     }).catch(error => {
       console.error('Error:', error);
     });
@@ -64,6 +70,11 @@ const AuthForm = () => {
 
   return (
     <section className={classes.auth}>
+      {loginSuccess? (
+        <Redirect to="/profile"/>
+      ):
+      (
+      <React.Fragment>
       <h1>{isLogin ? 'Login' : 'Sign Up'}</h1>
       <form onSubmit={submitHandler}>
         <div className={classes.control}>
@@ -94,8 +105,8 @@ const AuthForm = () => {
             {isLogin ? 'Create new account' : 'Login with existing account'}
           </button>
         </div>
-        
       </form>
+      </React.Fragment>)}
     </section>
   );
 };
