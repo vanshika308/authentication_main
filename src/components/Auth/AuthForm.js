@@ -1,10 +1,10 @@
-import { useState, useRef } from 'react';
-
+import { useState,useEffect, useRef, useContext } from 'react';
+import AuthContext from '../../store/auth-context';
 import classes from './AuthForm.module.css';
 
 const AuthForm = () => {
 
-
+  const authcntx = useContext(AuthContext);
   const signUpApiUrl = 'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAvZIq-A0N_hH-2GVtOoec3EgmnERktZAk';
   const loginApiUrl ='https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAvZIq-A0N_hH-2GVtOoec3EgmnERktZAk';
   const emailInputRef = useRef();
@@ -12,7 +12,12 @@ const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
-
+  useEffect(() => {
+    if (!authcntx.token) {
+      emailInputRef.current.value = '';
+      passwordInputRef.current.value = '';
+    }
+  }, [authcntx.token]);
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
   };
@@ -37,21 +42,19 @@ const AuthForm = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-    }).then(res => {
-      if (res.ok) {
+    }).then(res => {if (res.ok) {
         setIsLoading(false);
-        return res.json(); // Return the parsed JSON response
+        return res.json(); 
       } else {
         return res.json().then(data => {
           console.log(data);
           alert(data.error.message);
           setIsLoading(false);
-          throw new Error(data.error.message); // Throw an error to handle it in the next .catch()
         });
       }
     }).then(data => {
-      // Console log the ID token here
       console.log('ID Token:', data.idToken);
+      authcntx.login(data.idToken); 
     }).catch(error => {
       console.error('Error:', error);
     });
@@ -91,6 +94,7 @@ const AuthForm = () => {
             {isLogin ? 'Create new account' : 'Login with existing account'}
           </button>
         </div>
+        
       </form>
     </section>
   );
